@@ -9,6 +9,8 @@ debug = False
 
 # from http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
 # convenience function because python < 3.2 has no exist_ok
+
+
 def mkdir_p(path):
     # safely allows mkdir_p(os.path.dirname('nodirs'))
     if path == '':
@@ -26,6 +28,7 @@ def mkdir_p(path):
 # credits: http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
 def which(program):
     import os
+
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
@@ -41,6 +44,7 @@ def which(program):
                 return exe_file
 
     return None
+
 
 def version(cur):
     import argparse
@@ -68,8 +72,8 @@ def version(cur):
         jmdict_mtime = fmt('Database not found!', 'error')
 
     if config:
-        version = fmt(config.get('core','version'), 'parameter')
-        prefix = fmt(config.get('paths','prefix'), 'parameter')
+        version = fmt(config.get('core', 'version'), 'parameter')
+        prefix = fmt(config.get('paths', 'prefix'), 'parameter')
     else:
         version = fmt('Config not found!', 'error')
         prefix = fmt('Config not found!', 'error')
@@ -99,38 +103,40 @@ External programs:
   nice: %s
   ionice: %s
 '''.strip() % (
-    version,
-    dbversion,
-    jmdict_mtime,
-    fmt(platform.python_version(), 'parameter'),
-    fmt(platform.platform(), 'parameter'),
+        version,
+        dbversion,
+        jmdict_mtime,
+        fmt(platform.python_version(), 'parameter'),
+        fmt(platform.platform(), 'parameter'),
 
-    prefix,
+        prefix,
 
-    fmt(romkan.__version__, 'parameter'),
-    # fmt(termcolor.__version__, 'parameter'),
-    fmt(argparse.__version__, 'parameter'),
-    fmt(psutil_version, 'parameter'),
+        fmt(romkan.__version__, 'parameter'),
+        # fmt(termcolor.__version__, 'parameter'),
+        fmt(argparse.__version__, 'parameter'),
+        fmt(psutil_version, 'parameter'),
 
-    scripts['gzip'],
-    scripts['rsync'],
-    scripts['nice'],
-    scripts['ionice'],
+        scripts['gzip'],
+        scripts['rsync'],
+        scripts['nice'],
+        scripts['ionice'],
     ))
+
 
 def color_pager():
     '''Return None, or a color-enabled pager to use.'''
     pager = os.getenv('MYOUGIDENPAGER')
 
     # trust user to set his color-enabled pager
-    if pager: return pager
+    if pager:
+        return pager
 
     # guess
     pager = os.getenv('PAGER')
 
     if not pager:
         if which('less'):
-            pager='less'
+            pager = 'less'
             os.environ['LESS'] = 'FRX'
             return pager
         else:
@@ -154,14 +160,20 @@ def color_pager():
 
 # credits:
 # http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
+
+
 def get_terminal_size():
     import os
     env = os.environ
+
     def ioctl_GWINSZ(fd):
         try:
-            import fcntl, termios, struct, os
+            import fcntl
+            import termios
+            import struct
+            import os
             cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ,
-        '1234'))
+                                                 '1234'))
         except:
             return
         return cr

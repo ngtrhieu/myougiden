@@ -1,27 +1,35 @@
 import re
 
 # extracted from edict "reading" fields. TODO: cross-check with Unicode
-edict_kana='・？ヽヾゝゞー〜ぁあぃいうぇえおかがきぎくぐけげこごさざしじすずせぜそぞただちっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろわゐゑをんァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロヮワヰヱヲンヴヶ'
-edict_kana_regexp=re.compile("^[%s]+$" % edict_kana)
+edict_kana = '・？ヽヾゝゞー〜ぁあぃいうぇえおかがきぎくぐけげこごさざしじすずせぜそぞただちっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろわゐゑをんァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロヮワヰヱヲンヴヶ'
+edict_kana_regexp = re.compile("^[%s]+$" % edict_kana)
 
-latin_regexp=re.compile(r'^[\]\-'
-                       + r' !"#$%&()*+,./:;<=>?@\\^_`{}|~‘’“”'
-                       + "'"
-                       + 'a-zA-Z0-9'
-                       + ']+$')
+latin_regexp = re.compile(r'^[\]\-'
+                          + r' !"#$%&()*+,./:;<=>?@\\^_`{}|~‘’“”'
+                          + "'"
+                          + 'a-zA-Z0-9'
+                          + ']+$')
+
+
 def is_latin(string):
     return latin_regexp.match(string) is not None
 
-romaji_regexp=re.compile(r'^[\]\-'
-                         + r' !"#$%&()*+,./:;<=>?@\\^_`{}|~‘’“”'
-                         + "'"
-                         + 'a-zA-Z0-9'
-                         + 'āēīōūĀĒĪŌŪâêîôûÂÊÎÔÛ'
-                         + ']+$')
+
+romaji_regexp = re.compile(r'^[\]\-'
+                           + r' !"#$%&()*+,./:;<=>?@\\^_`{}|~‘’“”'
+                           + "'"
+                           + 'a-zA-Z0-9'
+                           + 'āēīōūĀĒĪŌŪâêîôûÂÊÎÔÛ'
+                           + ']+$')
+
+
 def is_romaji(string):
     return romaji_regexp.match(string) is not None
+
+
 def is_kana(string):
     return edict_kana_regexp.match(string) is not None
+
 
 class MatchesNothing():
     '''Fake regexp object that matches nothing.
@@ -32,13 +40,17 @@ class MatchesNothing():
 
     def search(self, string, flags=0):
         return None
+
     def match(self, string, flags=0):
         return None
+
 
 matchesnothing = MatchesNothing()
 
 
 regexp_store = {}
+
+
 def get_regexp(pattern, flags):
     '''Return a compiled regexp from persistent store; make one if needed.
 
@@ -60,10 +72,12 @@ def get_regexp(pattern, flags):
             regexp_store[pattern] = matchesnothing
             return matchesnothing
 
+
 def has_regexp_special(string):
     '''True if string has special characters of regular expressions.'''
     special = re.compile('[%s]' % re.escape(r'.^$*+?{}()[]\|'))
     return special.search(string)
+
 
 romaji_expansions = {
     'ā': 'aa',
@@ -77,6 +91,7 @@ romaji_expansions_o = [{'ō': 'ou', 'ô': 'ou'},
                        {'ō': 'oo', 'ô': 'oo'}]
 romaji_expansions_e = [{'ē': 'ei', 'ê': 'ei'},
                        {'ē': 'ee', 'ê': 'ee'}]
+
 
 def expand_romaji(string):
     '''kā -> [kaa] ; kāmyō -> [kaamyou, kaamyoo] '''
@@ -95,4 +110,3 @@ def expand_romaji(string):
             if var not in variations:
                 variations.append(var)
     return variations
-

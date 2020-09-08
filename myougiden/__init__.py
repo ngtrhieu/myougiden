@@ -3,6 +3,7 @@ import re
 import os
 import sys
 
+
 def read_config(prefix, rel='etc/myougiden/config.ini'):
     path = os.path.join(prefix, rel)
     if os.path.isfile(path):
@@ -12,6 +13,7 @@ def read_config(prefix, rel='etc/myougiden/config.ini'):
         return cp
     else:
         return None
+
 
 def find_config():
     # detect installation prefix. is there a better way of doing this?
@@ -26,8 +28,10 @@ def find_config():
 
     for prefix in prefixes:
         cp = read_config(prefix)
-        if cp: return cp
+        if cp:
+            return cp
 
     return None
+
 
 config = find_config()

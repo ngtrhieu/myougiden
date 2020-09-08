@@ -14,6 +14,7 @@ config = ConfigParser()
 config.read('etc/myougiden/config.ini')
 version = config.get('core', 'version')
 
+
 def md_to_rest(f):
     '''Very hacky.'''
 
@@ -25,8 +26,9 @@ def md_to_rest(f):
     s = s.replace(":\n\n", "::\n\n")
     return s
 
+
 with open('README.md', 'r') as f:
-    longdesc=md_to_rest(f)
+    longdesc = md_to_rest(f)
 
 setup(name='myougiden',
       version=version,
@@ -42,7 +44,7 @@ setup(name='myougiden',
       install_requires=[
           'romkan',
           'termcolor',
-          ],
+      ],
       python_requires='>=3',
       classifiers=[
           'Development Status :: 4 - Beta',
@@ -57,6 +59,5 @@ setup(name='myougiden',
           'Programming Language :: Python :: 3',
           'Topic :: Education',
           'Topic :: Text Processing :: Linguistic',
-          ]
-     )
-
+      ]
+      )

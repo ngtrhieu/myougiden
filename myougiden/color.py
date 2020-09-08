@@ -8,7 +8,7 @@ use_color = False
 
 # style : args
 # *args as for colored()
-DARKBG={
+DARKBG = {
     # color problems:
     # - japanese bitmap fonts are kinda crummy in bold
     # - non-bold grey doesn't even show in my dark xterm
@@ -37,7 +37,7 @@ DARKBG={
     'done': ('cyan', None, ['bold']),
 }
 
-LIGHTBG={
+LIGHTBG = {
     'reading': ('magenta', None, None),
     'kanji': ('blue', None, None),
     'misc': ('grey', None, None),
@@ -55,7 +55,8 @@ LIGHTBG={
     'done': ('blue', None, ['bold']),
 }
 
-style=DARKBG
+style = DARKBG
+
 
 def coloredp(string, color=None, on_color=None, attrs=None):
     if use_color:
@@ -65,11 +66,15 @@ def coloredp(string, color=None, on_color=None, attrs=None):
         return string
 
 # convenience function to turn on bold
+
+
 def coloredpb(string, color):
     return coloredp(string, color=color, attrs=['bold'])
 
+
 def fmt(string, sty):
     return coloredp(string, *(style[sty]))
+
 
 def percent(string, percent):
     if not use_color:
@@ -82,6 +87,7 @@ def percent(string, percent):
         return fmt(string, 'finishing')
     else:
         return fmt(string, 'done')
+
 
 def color_regexp(reg_obj, longstring, base_style=None, match_style='match'):
     '''Search regexp in longstring; return longstring with match colored.'''
@@ -104,12 +110,15 @@ def color_regexp(reg_obj, longstring, base_style=None, match_style='match'):
         return head + fmt(m.group(), match_style) + tail
 
 # credit: http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
+
+
 def luma(rgbhex):
     '''Retuns between 0 and 255.'''
     rgb = rgbhex.lstrip('#')
     return ((0.299 * int(rgb[0:2], 16))
             + (0.587 * int(rgb[2:4], 16))
             + (0.114 * int(rgb[4:6], 16)))
+
 
 def guess_background():
     # our own variable; not in any standard
@@ -160,9 +169,7 @@ def guess_background():
                     else:
                         return 'dark'
 
-
     # TODO: there's a very complex method to query xterm.
     # but it's complex, and screen breaks it anyway.
 
     return None
-

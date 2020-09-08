@@ -13,12 +13,15 @@ myouscript = os.path.realpath(
         '..',
         'bin',
         'myougiden'
-        ))
+    ))
+
 
 def call(*args):
     subprocess.call(args, stdout=devnull)
 
 # low ent_seq
+
+
 def quicksearch1():
     call(myouscript,
          '-e', 'whole',
@@ -27,12 +30,15 @@ def quicksearch1():
          'ヽ')
 
 # high ent_seq
+
+
 def quicksearch2():
     call(myouscript,
          '-e', 'whole',
          '--kanji',
          '--output-mode', 'tab',
          '首鼠')
+
 
 def quicksearch3():
     call(myouscript,
@@ -42,11 +48,14 @@ def quicksearch3():
          'acetylcellulose')
 
 # try to guess everything and fail
+
+
 def slowsearch1():
     call(myouscript,
          '-e', 'auto',
          '--output-mode', 'human',
          '亞衣有会尾')
+
 
 def slowsearch2():
     call(myouscript,
@@ -56,6 +65,8 @@ def slowsearch2():
          '亞衣有会尾')
 
 # sometimes non-regexp word search seems especially slow
+
+
 def slowsearch3():
     call(myouscript,
          '-e', 'auto',
@@ -64,7 +75,7 @@ def slowsearch3():
 
 
 # dummy searches to cache db in filesystem
-for i in (1,2,3):
+for i in (1, 2, 3):
     quicksearch1()
     quicksearch2()
     quicksearch3()

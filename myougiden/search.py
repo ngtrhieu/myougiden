@@ -5,6 +5,7 @@ from myougiden import database
 from myougiden import texttools as tt
 from copy import deepcopy
 
+
 class SearchConditions():
     '''A set of conditions to query the dictionary.
 
@@ -19,7 +20,7 @@ class SearchConditions():
                  regexp,
                  field,
                  extent,
-                ):
+                 ):
         self.regexp = regexp
         self.field = field
         self.extent = extent
@@ -31,9 +32,8 @@ class SearchConditions():
 
         self.args = cmdline_args
 
-
     def extent_sort_key(self):
-        return ['whole','word','beginning','partial'].index(self.extent)
+        return ['whole', 'word', 'beginning', 'partial'].index(self.extent)
 
     def field_sort_key(self):
         if tt.is_kana(self.args.query_s):
@@ -49,7 +49,6 @@ class SearchConditions():
         else:
             # doesn't look like kana or latin, probably kanji but who knows
             return ['kanji', 'reading', 'gloss'].index(self.field)
-
 
     def sort_key(self):
         if self.regexp == True:
@@ -72,8 +71,9 @@ class SearchConditions():
 
     def __repr__(self):
         return("'%s': regexp %s, field %s, extent %s\n sort key: %s" %
-              (list(self.query), self.regexp, self.field, self.extent,
-               self.sort_key()))
+               (list(self.query), self.regexp, self.field, self.extent,
+                self.sort_key()))
+
 
 def generate_search_conditions(args):
     '''args = command-line argument dict (argparse object)'''
@@ -138,20 +138,22 @@ def generate_search_conditions(args):
                 # TODO: add wide-char
 
                 for query in queries:
-                    conditions.append(SearchConditions(args, query, regexp, field, extent))
+                    conditions.append(SearchConditions(
+                        args, query, regexp, field, extent))
 
     return conditions
+
 
 def search_by(cur, cond):
     '''Main search function.  Take a SearchCondition object, return list of ent_seqs.
     '''
 
     if ((cond.field == 'gloss' and cond.case_sensitive)
-        or cond.extent in ('whole', 'partial')):
-        fts=False
+            or cond.extent in ('whole', 'partial')):
+        fts = False
         query_s = cond.query_s[:]
     else:
-        fts=True
+        fts = True
         query_prep = []
         for cmdline_arg in cond.query:
             # unify Japanese spaces, newlines etc. to a single space
@@ -219,7 +221,7 @@ def search_by(cur, cond):
                 operator = '= ?'
                 query_s = query_s.replace('\\', '\\\\')
                 if cond.case_sensitive and cond.field == 'gloss':
-                    where_extra = 'COLLATE BINARY';
+                    where_extra = 'COLLATE BINARY'
 
             else:
                 # extent = 'partial
@@ -239,14 +241,13 @@ def search_by(cur, cond):
     if cond.frequent:
         where_extra += ' AND %s.frequent = 1' % table
 
-
     database.execute(cur, '''
 SELECT DISTINCT ent_seq
 FROM %s
 WHERE %s %s %s
 ;'''
-                % (table, cond.field, operator, where_extra),
-                [query_s])
+                     % (table, cond.field, operator, where_extra),
+                     [query_s])
 
     res = []
     for row in cur.fetchall():
@@ -269,12 +270,14 @@ def guess(cur, conditions):
 
     conditions.sort(key=lambda cond: cond.sort_key())
     if common.debug:
-        import pprint; pprint.pprint(conditions)
+        import pprint
+        pprint.pprint(conditions)
     for condition in conditions:
         res = search_by(cur, condition)
         if len(res) > 0:
             return (condition, res)
     return (None, [])
+
 
 def matched_regexp(conds):
     '''Return a regexp that reflects what the SearchConditions matched.
@@ -302,5 +305,3 @@ def matched_regexp(conds):
         reg = tt.get_regexp(reg, re.I)
 
     return reg
-
-

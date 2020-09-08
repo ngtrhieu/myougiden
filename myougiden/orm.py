@@ -4,15 +4,17 @@ from myougiden import color
 from myougiden import database
 from myougiden.color import fmt
 
+
 class Entry():
     '''Equivalent to JMdict entry.'''
+
     def __init__(self,
-                 ent_seq=None, # JMdict ID
-                 frequent=False, # similar to EDICT (P)
-                 kanjis=None, # list of Kanjis()
-                 readings=None, # list of Readings()
-                 senses=None, # list of Senses
-                ):
+                 ent_seq=None,  # JMdict ID
+                 frequent=False,  # similar to EDICT (P)
+                 kanjis=None,  # list of Kanjis()
+                 readings=None,  # list of Readings()
+                 senses=None,  # list of Senses
+                 ):
         self.ent_seq = ent_seq
         self.kanjis = kanjis or []
         self.readings = readings or []
@@ -23,8 +25,8 @@ class Entry():
         # TODO: more fine-grained
         return self.frequent
 
-
     # this thing really needs to be better thought of
+
     def format_tsv(self, search_conds, romajifn=None):
         matchreg = search.matched_regexp(search_conds)
 
@@ -50,7 +52,6 @@ class Entry():
                 # I am unreasonably proud of this solution.
                 sense.glosses[idx] = sense.glosses[idx].replace(gsep, '¦')
 
-
         s = ''
 
         s += rsep.join([r.fmt(search_conds)
@@ -60,7 +61,8 @@ class Entry():
 
         for sense in self.senses:
             tagstr = sense.tagstr(search_conds)
-            if tagstr: tagstr += ' '
+            if tagstr:
+                tagstr += ' '
 
             s += "\t%s%s" % (tagstr, gsep.join(sense.glosses))
 
@@ -91,7 +93,6 @@ class Entry():
         if self.is_frequent():
             s += fmt('※', 'highlight') + ' '
 
-
         has_re_restr = False
         for r in self.readings:
             if r.re_restr:
@@ -101,7 +102,8 @@ class Entry():
         if self.kanjis:
             if not has_re_restr:
                 s += ksep.join([k.fmt(search_conds) for k in self.kanjis])
-                s += rpar % (rsep.join([r.fmt(search_conds) for r in self.readings]))
+                s += rpar % (rsep.join([r.fmt(search_conds)
+                                        for r in self.readings]))
             else:
                 ks = []
                 for k in self.kanjis:
@@ -113,23 +115,25 @@ class Entry():
         else:
             s += rsep.join([r.fmt(search_conds) for r in self.readings])
 
-
         for sensenum, sense in enumerate(self.senses, start=1):
             sn = fmt('%d.' % sensenum, 'misc')
 
             tagstr = sense.tagstr(search_conds)
-            if tagstr: tagstr += ' '
+            if tagstr:
+                tagstr += ' '
 
             s += "\n%s %s%s" % (sn,
                                 tagstr,
                                 gsep.join(sense.fmt_glosses(search_conds)))
         return s
 
+
 class Kanji():
     '''Equivalent to JMdict <k_ele>.'''
+
     def __init__(self,
                  kanji_id=None,
-                 text=None, # = keb
+                 text=None,  # = keb
                  frequent=False,
                  ke_inf=None):
         self.kanji_id = kanji_id
@@ -141,9 +145,9 @@ class Kanji():
         if search_conds and search_conds.field == 'kanji':
             matchreg = search.matched_regexp(search_conds)
             t = color.color_regexp(matchreg,
-                                      self.text,
-                                      'kanji',
-                                      'matchjp')
+                                   self.text,
+                                   'kanji',
+                                   'matchjp')
         else:
             t = fmt(self.text, 'kanji')
 
@@ -154,9 +158,10 @@ class Kanji():
 
 class Reading():
     '''Equivalent to JMdict <r_ele>.'''
+
     def __init__(self,
                  reading_id=None,
-                 text=None, # = reb
+                 text=None,  # = reb
                  re_nokanji=False,
                  re_restr=None,
                  re_inf=None,
@@ -164,7 +169,7 @@ class Reading():
 
                  # None or a function
                  romaji=None,
-                ):
+                 ):
         self.reading_id = reading_id
         self.text = text
         self.re_nokanji = re_nokanji
@@ -182,9 +187,9 @@ class Reading():
         if search_conds and search_conds.field == 'reading':
             matchreg = search.matched_regexp(search_conds)
             t = color.color_regexp(matchreg,
-                                      t,
-                                      'reading',
-                                      'matchjp')
+                                   t,
+                                   'reading',
+                                   'matchjp')
         else:
             t = fmt(t, 'reading')
 
@@ -224,7 +229,7 @@ class Sense():
 
                  # TODO
                  # lsource=None,
-                ):
+                 ):
         self.sense_id = sense_id
 
         self.glosses = glosses or list()
@@ -238,7 +243,6 @@ class Sense():
         self.dial = dial
 
         self.s_inf = s_inf
-
 
     def tagstr(self, search_conditions):
         '''Return a string with all information tags.
@@ -276,7 +280,7 @@ class Sense():
             matchreg = search.matched_regexp(search_conds)
             return [color.color_regexp(matchreg,
                                        gloss)
-                   for gloss in self.glosses]
+                    for gloss in self.glosses]
         else:
             return [gloss for gloss in self.glosses]
 
@@ -324,16 +328,15 @@ def fetch_entry(cur, ent_seq):
         database.execute(cur, '''SELECT re_restr
                     FROM reading_restrictions
                     WHERE reading_id = ?;''',
-                    [reading.reading_id])
+                         [reading.reading_id])
         for row in cur.fetchall():
             reading.re_restr.append(row[0])
 
         readings.append(reading)
 
-
     senses = []
-    database.execute(cur, 
-        '''SELECT
+    database.execute(cur,
+                     '''SELECT
         sense_id,
         pos,
         field,
@@ -342,8 +345,8 @@ def fetch_entry(cur, ent_seq):
         s_inf
         FROM senses
         WHERE ent_seq = ?;''',
-        [ent_seq]
-    )
+                     [ent_seq]
+                     )
 
     for row in cur.fetchall():
         sense = Sense(sense_id=row[0],
@@ -358,7 +361,7 @@ def fetch_entry(cur, ent_seq):
                     FROM sense_kanji_restrictions
                     WHERE sense_id = ?;
                     ''', [sense.sense_id]
-                   )
+                         )
         for row in cur.fetchall():
             sense.stagk.append(row[0])
 
@@ -367,33 +370,38 @@ def fetch_entry(cur, ent_seq):
                     FROM sense_reading_restrictions
                     WHERE sense_id = ?;
                     ''', [sense.sense_id]
-                   )
+                         )
         for row in cur.fetchall():
             sense.stagr.append(row[0])
 
-        database.execute(cur, 'SELECT gloss FROM glosses WHERE sense_id = ?;', [sense.sense_id])
+        database.execute(
+            cur, 'SELECT gloss FROM glosses WHERE sense_id = ?;', [sense.sense_id])
         for row in cur.fetchall():
             sense.glosses.append(row[0])
 
         senses.append(sense)
 
-    database.execute(cur, 'SELECT frequent FROM entries WHERE ent_seq = ?;', [ent_seq])
-    frequent=cur.fetchone()[0]
+    database.execute(
+        cur, 'SELECT frequent FROM entries WHERE ent_seq = ?;', [ent_seq])
+    frequent = cur.fetchone()[0]
 
     return Entry(ent_seq=ent_seq,
                  frequent=frequent,
                  kanjis=kanjis,
                  readings=readings,
                  senses=senses,
-                )
+                 )
+
 
 def short_expansion(cur, abbrev):
-    database.execute(cur, ''' SELECT short_expansion FROM abbreviations WHERE abbrev = ? ;''', [abbrev])
+    database.execute(
+        cur, ''' SELECT short_expansion FROM abbreviations WHERE abbrev = ? ;''', [abbrev])
     row = cur.fetchone()
     if row:
         return row[0]
     else:
         return None
+
 
 def abbrev_line(cur, abbrev):
     exp = short_expansion(cur, abbrev)
@@ -403,6 +411,7 @@ def abbrev_line(cur, abbrev):
     else:
         return None
 
+
 def abbrevs_table(cur):
     database.execute(cur, '''
     SELECT abbrev
@@ -410,7 +419,7 @@ def abbrevs_table(cur):
     ORDER BY abbrev
     ;''')
 
-    abbrevs=[]
+    abbrevs = []
     for row in cur.fetchall():
         abbrevs.append(row[0])
     return "\n".join([abbrev_line(cur, abbrev) for abbrev in abbrevs])
